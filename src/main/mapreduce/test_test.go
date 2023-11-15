@@ -16,8 +16,8 @@ import "strconv"
 
 const (
 	nNumber = 100000
-	nMap    = 100
-	nReduce = 50
+	nMap    = 10
+	nReduce = 5
 )
 
 // Create input file with N numbers
