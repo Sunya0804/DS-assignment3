@@ -1,6 +1,9 @@
 package mapreduce
 
-import "testing"
+import (
+	"path/filepath"
+	"testing"
+)
 import "fmt"
 import "time"
 import "container/list"
@@ -112,14 +115,13 @@ func makeInput() string {
 // in /var/tmp. can't use current directory since
 // AFS doesn't support UNIX-domain sockets.
 func port(suffix string) string {
-	s := "/var/tmp/824-"
-	s += strconv.Itoa(os.Getuid()) + "/"
-	os.Mkdir(s, 0777)
-	s += "mr"
-	s += strconv.Itoa(os.Getpid()) + "-"
-	s += suffix
+	// Use a unique name based on the process ID and suffix
+	s := "/var/tmp/824-" + strconv.Itoa(os.Getuid()) + "/mr-" + strconv.Itoa(os.Getpid()) + "-" + suffix
+	os.MkdirAll(filepath.Dir(s), 0777) // Create parent directories if not exist
 	return s
 }
+
+// ...
 
 func setup() *MapReduce {
 	file := makeInput()

@@ -10,16 +10,19 @@ type WorkerInfo struct {
 
 func assignJobsToWorkers(mr *MapReduce, doneChannel chan int, job JobType, nJobs int, nOtherJobs int) {
 	for i := 0; i < nJobs; i++ {
-		worker := <-mr.registerChannel
-		args := &DoJobArgs{mr.file, job, i, nOtherJobs}
-		var reply DoJobReply
-		ok := call(worker, "Worker.DoJob", args, &reply)
-		if ok == false {
-			fmt.Printf("DoJob: RPC %s do %s error\n", worker, job)
-		} else {
-			doneChannel <- 1
-			mr.registerChannel <- worker
-		}
+		go func(jobNum int) {
+			worker := <-mr.registerChannel
+
+			args := &DoJobArgs{mr.file, job, jobNum, nOtherJobs}
+			var reply DoJobReply
+
+			ok := call(worker, "Worker.DoJob", args, &reply)
+			if ok == true {
+				doneChannel <- 1
+				mr.registerChannel <- worker
+			}
+
+		}(i)
 	}
 }
 
